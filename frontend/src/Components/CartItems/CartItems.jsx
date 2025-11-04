@@ -4,6 +4,44 @@ import { ShopContext } from "../../Context/ShopContext";
 import remove_icon from "../Assets/cart_cross_icon.png";
 const CartItems = () => {
   const {getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
+
+  const handlepayment=async()=>{
+    const res=await fetch("http://localhost:4000/create-order",{
+      method:'POST',
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({amount:getTotalCartAmount()}),
+    });
+    const order=await res.json();
+    openRazorpay(order);
+  }
+  const openRazorpay = (order) => {
+    const options = {
+      key: "rzp_test_Rbgk97dfA8EOvs", // 🔑 Replace with your Razorpay key_id
+      amount: order.amount,
+      currency: order.currency,
+      name: "Your Store Name",
+      description: "Thanks for shopping with us!",
+      order_id: order.id, // This comes from backend
+      handler: function (response) {
+        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
+        // Optionally, verify the payment on your backend here
+      },
+      prefill: {
+        name: "John Doe",
+        email: "johndoe@example.com",
+        contact: "9876543210",
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    // 3️⃣ Create Razorpay instance and open popup
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  };
   return (
     <div className="cartitems">
       <div className="cartitems-format-main">
@@ -60,7 +98,7 @@ const CartItems = () => {
                     <h3>${getTotalCartAmount()}</h3>
                 </div>
             </div>
-            <button>PROCEED TO CHECKOUT</button>
+            <button onClick={handlepayment}>PROCEED TO CHECKOUT</button>
         </div>
         <div className="cartitem-promocode">
             <p>Enter promo code </p>

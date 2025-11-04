@@ -10,6 +10,7 @@ const path = require('path');
 const cors =require('cors');
 const { type } = require('os');
 const { log, error } = require('console');
+const router = require('./routes/Router');
 
 
 app.use(express.json());
@@ -219,11 +220,6 @@ app.get('/popularinwomen',async(req,res)=>{
 })
 
 //creating endpoint for women,men,kids
-// app.get('/men', async (req, res) => {
-//   const products = await Product.find({ category: "men" });
-//   res.json(products);
-// });
-
 app.get('/:category', async (req, res) => {
   try {
     const {category}=req.params;
@@ -277,6 +273,7 @@ app.post('/getcart',fetchUser,async (req,res)=>{
     let userData=await Users.findOne({_id:req.user.id});
     res.json(userData.cartData)
 })
+app.use("/", router);
 app.listen(port,(error)=>{
     if(!error){
         console.log("Server running on port "+port)
