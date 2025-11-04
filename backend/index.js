@@ -214,9 +214,28 @@ app.get('/newcollections',async (req,res)=>{
 app.get('/popularinwomen',async(req,res)=>{
     let products =await Product.find({category:"women"});
     let popular_in_women=products.slice(0,4);
-    console.log("Popular in women fetched");
+    // console.log("Popular in women fetched");
     res.send(popular_in_women);
 })
+
+//creating endpoint for women,men,kids
+// app.get('/men', async (req, res) => {
+//   const products = await Product.find({ category: "men" });
+//   res.json(products);
+// });
+
+app.get('/:category', async (req, res) => {
+  try {
+    const {category}=req.params;
+        // console.log("Fetching products for:", category);
+    const products = await Product.find({ category});
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: `Error fetching ${category} products` });
+  }
+});
+
 //creating middleware to fetch user
 const fetchUser=async(req,res,next)=>{
     const token=req.header('auth-token');
