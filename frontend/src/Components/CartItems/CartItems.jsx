@@ -18,15 +18,14 @@ const CartItems = () => {
   }
   const openRazorpay = (order) => {
     const options = {
-      key: "rzp_test_Rbgk97dfA8EOvs", // 🔑 Replace with your Razorpay key_id
+      key: "rzp_test_Rbgk97dfA8EOvs", 
       amount: order.amount,
       currency: order.currency,
-      name: "Your Store Name",
+      name: "Store Name",
       description: "Thanks for shopping with us!",
       order_id: order.id, // This comes from backend
       handler: function (response) {
         alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-        // Optionally, verify the payment on your backend here
       },
       prefill: {
         name: "John Doe",

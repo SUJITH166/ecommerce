@@ -10,7 +10,7 @@ const path = require('path');
 const cors =require('cors');
 const { type } = require('os');
 const { log, error } = require('console');
-const router = require('./routes/Router');
+const router = require('./routes/router');
 
 
 app.use(express.json());
