@@ -11,6 +11,7 @@ const ShopCategory = (props) => {
     const fetchProducts = async () => {
       try {
         const res = await fetch(`${process.env.REACT_APP_API_URL}/${props.category}`);
+        console.log(process.env.REACT_APP_API_URL)
         const data = await res.json();
         setProducts(data);
       } catch (err) {

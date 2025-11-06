@@ -4,6 +4,8 @@ import { ShopContext } from "../../Context/ShopContext";
 import remove_icon from "../Assets/cart_cross_icon.png";
 const API_URL=process.env.REACT_APP_API_URL;
 // const
+console.log("API URL: in cart", API_URL);
+
 const CartItems = () => {
   const {getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
 
