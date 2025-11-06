@@ -7,25 +7,38 @@ const API_URL=process.env.REACT_APP_API_URL;
 const CartItems = () => {
   const {getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
 
+  const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
   const handlepayment=async()=>{
-    const res=await fetch(`${API_URL}/create-order`,{
-      method:'POST',
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({amount:getTotalCartAmount()}),
-    });
-    const order=await res.json();
-    openRazorpay(order);
+   const res = await loadRazorpayScript();
+  if (!res) {
+    alert("Razorpay SDK failed to load. Check your network.");
+    return;
   }
-  const openRazorpay = (order) => {
+
+  // Fetch order from backend
+  const orderResponse = await fetch(`${API_URL}/create-order`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount: 500 }),
+  });
+
+  const data = await orderResponse.json();
+ 
     const options = {
       key: `${process.env.REACT_APP_R_KEY_ID}`, 
-      amount: order.amount,
-      currency: order.currency,
+      amount: data.amount,
+      currency: data.currency,
       name: "Store Name",
       description: "Thanks for shopping with us!",
-      order_id: order.id, // This comes from backend
+      order_id: data.id, // This comes from backend
       handler: function (response) {
         alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
       },
