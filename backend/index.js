@@ -14,7 +14,15 @@ const router = require('./routes/router');
 
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: [
+    "http://localhost:3000",         // for local React dev
+    "http://localhost:5173",         // if you ever test with Vite locally
+    "https://ecommerce-i18j.vercel.app/"      // your actual frontend domain
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD); // encode special chars
 const DB_NAME = process.env.DB_NAME;
