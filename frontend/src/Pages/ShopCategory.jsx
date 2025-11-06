@@ -10,7 +10,7 @@ const ShopCategory = (props) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch(`http://localhost:4000/${props.category}`);
+        const res = await fetch(`${process.env.REACT_APP_API_URL}/${props.category}`);
         const data = await res.json();
         setProducts(data);
       } catch (err) {

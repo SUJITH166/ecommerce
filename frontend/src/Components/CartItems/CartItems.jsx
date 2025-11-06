@@ -2,11 +2,13 @@ import React, { useContext } from "react";
 import "./CartItems.css";
 import { ShopContext } from "../../Context/ShopContext";
 import remove_icon from "../Assets/cart_cross_icon.png";
+const API_URL=process.env.REACT_APP_API_URL;
+// const
 const CartItems = () => {
   const {getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
 
   const handlepayment=async()=>{
-    const res=await fetch("http://localhost:4000/create-order",{
+    const res=await fetch(`${API_URL}/create-order`,{
       method:'POST',
       headers:{
         "Content-Type":"application/json"
@@ -18,7 +20,7 @@ const CartItems = () => {
   }
   const openRazorpay = (order) => {
     const options = {
-      key: "rzp_test_Rbgk97dfA8EOvs", 
+      key: `${process.env.REACT_APP_R_KEY_ID}`, 
       amount: order.amount,
       currency: order.currency,
       name: "Store Name",
