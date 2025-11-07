@@ -18,7 +18,7 @@ app.use(cors({
   origin: [
     "http://localhost:3000",         // for local React dev
     "http://localhost:5173",         // if you ever test with Vite locally
-    "https://ecommerce-i18j.vercel.app/"      // your actual frontend domain
+    "https://ecommerce-i18j-hjlejyseg-sujiths-projects-40b977b8.vercel.app"      // your actual frontend domain
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
