@@ -11,18 +11,18 @@ const cors =require('cors');
 const { type } = require('os');
 const { log, error } = require('console');
 const router = require('./routes/router');
-
+// {
+//   origin: [
+//     "http://localhost:3000",         // for local React dev
+//     "http://localhost:5173",         // if you ever test with Vite locally
+//     "https://ecommerce-i18j-hjlejyseg-sujiths-projects-40b977b8.vercel.app"      // your actual frontend domain
+//   ],
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   credentials: true
+// }
 
 app.use(express.json());
-app.use(cors({
-  origin: [
-    "http://localhost:3000",         // for local React dev
-    "http://localhost:5173",         // if you ever test with Vite locally
-    "https://ecommerce-i18j-hjlejyseg-sujiths-projects-40b977b8.vercel.app"      // your actual frontend domain
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(cors());
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD); // encode special chars
 const DB_NAME = process.env.DB_NAME;
