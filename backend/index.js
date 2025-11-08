@@ -47,16 +47,16 @@ const storage= multer.diskStorage({
     }
 })
 
-const upload =multer({storage:storage})
+const upload =multer({storage:storage});
 
 //Creating upload Endpoint for images
-app.use('/images',express.static('upload/images'))
+app.use('/images',express.static('upload/images'));
 app.post("/upload",upload.single('product'),(req,res)=>{
     res.json({
         success:1,
         image_url:`${process.env.APP_API_URL}/images/${req.file.filename}`
     })
-})
+});
 //schema for creating products
 const Product=mongoose.model("Product",{
     id:{
