@@ -11,6 +11,10 @@ const cors =require('cors');
 const { type } = require('os');
 const { log, error } = require('console');
 const router = require('./routes/router');
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// console.log("✅ Loaded APP_API_URL:", process.env.APP_API_URL);
 // {
 //   origin: [
 //     "http://localhost:3000",         // for local React dev
@@ -23,6 +27,13 @@ const router = require('./routes/router');
 
 app.use(express.json());
 app.use(cors());
+
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.C_API_KEY,
+  api_secret: process.env.C_API_SECRET,
+});
+
 const DB_USER = process.env.DB_USER;
 const DB_PASSWORD = encodeURIComponent(process.env.DB_PASSWORD); // encode special chars
 const DB_NAME = process.env.DB_NAME;
@@ -40,23 +51,46 @@ app.get("/",(req,res)=>{
 })
 
 //Image storage
-const storage= multer.diskStorage({
-    destination: './upload/images',
-    filename: (req,file,cb)=>{
-        return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
-    }
-})
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ecommerce_uploads', // folder name in your Cloudinary account
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
+});
 
-const upload =multer({storage:storage});
+const upload = multer({ storage });
+
+// const storage= multer.diskStorage({
+//     destination: './upload/images',
+//     filename: (req,file,cb)=>{
+//         return cb(null,`${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+//     }
+// })
+
+// const upload =multer({storage:storage});
 
 //Creating upload Endpoint for images
 app.use('/images',express.static('upload/images'));
-app.post("/upload",upload.single('product'),(req,res)=>{
+app.post("/upload", upload.single('product'), (req, res) => {
+  try {
     res.json({
-        success:1,
-        image_url:`${process.env.APP_API_URL}/images/${req.file.filename}`
-    })
+      success: 1,
+      image_url: req.file.path, // Cloudinary gives the full hosted URL here
+    });
+  } catch (error) {
+    console.error("Upload failed:", error);
+    res.status(500).json({ success: 0, message: "Upload failed" });
+  }
 });
+
+// app.post("/upload",upload.single('product'),(req,res)=>{
+//     res.json({
+//         success:1,
+//         image_url:`${process.env.APP_API_URL}/images/${req.file.filename}`
+//     })
+// });
+
 //schema for creating products
 const Product=mongoose.model("Product",{
     id:{
