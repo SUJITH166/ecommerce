@@ -1,14 +1,48 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./CartItems.css";
 import { ShopContext } from "../../Context/ShopContext";
 import remove_icon from "../Assets/cart_cross_icon.png";
 const API_URL=process.env.REACT_APP_API_URL;
-// const
 // console.log("API URL: in cart", API_URL);
 
 const CartItems = () => {
   const {getTotalCartAmount, all_product, cartItems, removeFromCart } = useContext(ShopContext);
+  const [promocode,setpromocode]=useState('');
+  const [error,setError]=useState('');
+  const [discount,setDiscount]=useState('');
 
+  // Promocode
+   const validPromoCodes = {
+    "SAVE10": 10,   // 10% off
+    "WELCOME50": 50 // ₹50 off
+  };
+
+  const handleApplyPromo = () => {
+    const total = getTotalCartAmount();
+
+    if (validPromoCodes[promocode.toUpperCase()]) {
+      const value = validPromoCodes[promocode.toUpperCase()];
+      let discountedAmount = total;
+
+      if (value < 100) {
+        // percentage discount
+        discountedAmount = total - (total * value) / 100;
+      } else {
+        // flat discount
+        discountedAmount = total - value;
+      }
+
+      setDiscount(total - discountedAmount);
+      setError("");
+    } else {
+      setDiscount(0);
+      setError("Invalid promo code ");
+    }
+  };
+
+  const totalAfterDiscount = getTotalCartAmount() - discount;
+
+  //Razropay
   const loadRazorpayScript = () => {
   return new Promise((resolve) => {
     const script = document.createElement("script");
@@ -29,7 +63,7 @@ const CartItems = () => {
   const orderResponse = await fetch(`${API_URL}/create-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount: 500 }),
+    body: JSON.stringify({ amount: totalAfterDiscount||getTotalCartAmount() }),
   });
 
   const data = await orderResponse.json();
@@ -53,11 +87,12 @@ const CartItems = () => {
         color: "#3399cc",
       },
     };
-
+    
     // 3️⃣ Create Razorpay instance and open popup
     const rzp = new window.Razorpay(options);
     rzp.open();
   };
+ 
   return (
     <div className="cartitems">
       <div className="cartitems-format-main">
@@ -75,11 +110,11 @@ const CartItems = () => {
               <div className="cartitems-format cartitems-format-main">
                 <img src={e.image} alt="" className="carticon-product-icon" />
                 <p>{e.name}</p>
-                <p>${e.new_price}</p>
+                <p>₹{e.new_price}</p>
                 <button className="cartitems-quantity">
                   {cartItems[e.id]}
                 </button>
-                <p>${e.new_price * cartItems[e.id]}</p>
+                <p>₹{e.new_price * cartItems[e.id]}</p>
                 <img
                   className="cartitems-remove-icon"
                   src={remove_icon}
@@ -101,7 +136,7 @@ const CartItems = () => {
             <div>
                 <div className="cartitems-total-item">
                     <p>Subtotal</p>
-                    <p>${getTotalCartAmount()}</p>
+                    <p>₹{getTotalCartAmount()}</p>
                 </div>
                 <hr/>
                 <div className="cartitems-total-item">
@@ -111,7 +146,7 @@ const CartItems = () => {
                 <hr/>
                 <div className="cartitems-total-item">
                     <h3>Total</h3>
-                    <h3>${getTotalCartAmount()}</h3>
+                    <h3>₹{getTotalCartAmount()}</h3>
                 </div>
             </div>
             <button onClick={handlepayment}>PROCEED TO CHECKOUT</button>
@@ -120,8 +155,14 @@ const CartItems = () => {
             <p>Enter promo code </p>
         
         <div className="cartitems-promobox">
-            <input type="text" placeholder="promo code" />
-            <button>Submit</button>
+            <input value={promocode} onChange={(e)=>setpromocode(e.target.value)} type="text" placeholder="promo code" />
+            <button onClick={handleApplyPromo}>Submit</button>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {discount > 0 && (
+        <p style={{ color: "green" }}>Discount applied: ₹{discount}</p>
+      )}
+      <h3>Final Amount: ₹{totalAfterDiscount}</h3>
         </div>
         </div>
       </div>
